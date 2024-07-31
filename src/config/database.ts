@@ -19,7 +19,7 @@ class DBClient {
     }
   }
   // Confirm that the connection is open
-  public async isConnected(): Promise<boolean> {
+  public isConnected(): boolean {
     return mongoose.connection.readyState === 1;
   }
 }

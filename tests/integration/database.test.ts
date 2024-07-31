@@ -7,6 +7,6 @@ describe('DBClient', () => {
   it('should connect to the database', async () => {
     await dbclient.connect();
     expect(console.log).toHaveBeenCalledWith('Connected to MongoDB');
-    expect(await dbclient.isConnected()).toBe(true);
+    expect(dbclient.isConnected()).toBe(true);
   });
 });
