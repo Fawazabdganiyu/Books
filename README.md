@@ -47,7 +47,7 @@ npm run dev
 ```
 2. Open your browser and go to:
 ```
-http://localhost:5000/api-docs
+http://localhost:3000/api-docs
 ```
 
 ## Usage examples
