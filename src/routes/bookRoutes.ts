@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import bookController from '../controller/bookController';
+import BookController from '../controller/bookController';
+import fileMiddleware from '../middlewares/fileUpload';
 
 const router = Router();
 
@@ -28,7 +29,7 @@ const router = Router();
  *           type: string
  *           description: The published date of the book
  *         ISBN:
- *           type: string
+ *           type: number
  *           description: The ISBN of the book
  *         createdAt:
  *           type: Date
@@ -63,9 +64,34 @@ const router = Router();
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/Book'
+ *             type: object
+ *             required:
+ *               - title
+ *               - author
+ *               - publishedDate
+ *               - ISBN
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 description: The title of the book
+ *                 example: The New Age
+ *               author:
+ *                 type: string
+ *                 description: The author of the book
+ *                 example: Fawaz Abdganiyu
+ *               publishedDate:
+ *                 type: string
+ *                 description: The published date of the book
+ *                 example: 2024-04-01
+ *               ISBN:
+ *                 type: number
+ *                 description: The ISBN of the book
+ *               bookFile:
+ *                 type: file
+ *                 description: The file to upload (PDF or ePub)
+ *             
  *           example:   # Example for request body
  *             title: 'The New Age'
  *             author: 'Fawaz Abdganiyu'
@@ -87,9 +113,37 @@ const router = Router();
  *               updatedAt: '2021-08-01T00:00:00.000Z'
  *       400:
  *         description: Bad request. The book already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Response status
+ *                 message:
+ *                   type: string
+ *                   description: Error message
+ *               example:
+ *                 success: "false"
+ *                 message: The book already exists
  *       500:
  *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Response status
+ *                 message:
+ *                   type: string
+ *                   description: Error message
+ *               example:
+ *                 success: "false"
+ *                 message: Error uploading file
  */
-router.post('/', bookController.createBook);
+router.post('/', fileMiddleware, BookController.createBook);
 
 export default router;

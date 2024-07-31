@@ -17,7 +17,7 @@ describe('bookController', () => {
   describe('createBook', () => {
     it('should create a new book if it does not already exist', async () => {
       const { req, res, next } = mockExpressObjects();
-      req.body = { title: 'New Book', author: 'Author', publishedDate: '2024-07-31' , ISBN: '123456789' };
+      req.body = { title: 'New Book', author: 'Author', publishedDate: '2024-07-31' , ISBN: 123456789 };
   
       await bookController.createBook(req, res, next);
   
@@ -31,11 +31,47 @@ describe('bookController', () => {
   
     it('should not create a book and call next with an error if the book already exists', async () => {
       const { req, res, next } = mockExpressObjects();
-      req.body = { title: 'Existing Book', author: 'Author', publishedDate: '2024-07-31', ISBN: '123456789' };
+      req.body = { title: 'Existing Book', author: 'Author', publishedDate: '2024-07-31', ISBN: 123456789 };
   
       await bookController.createBook(req, res, next);
 
       expect(next).toHaveBeenCalledWith(new CustomError(400, 'Book already exists'));
+    });
+
+    it('should not create a book if publishDate field is missing', async () => {
+      const { req, res, next } = mockExpressObjects();
+      req.body = { title: 'New Book', author: 'Author', ISBN: 20240731 };
+  
+      await bookController.createBook(req, res, next);
+  
+      expect(next).toHaveBeenCalledWith(new CustomError(400, 'Published date is missing'));
+    });
+
+    it('should not create a book if author field is missing', async () => {
+      const { req, res, next } = mockExpressObjects();
+      req.body = { title: 'New Book', ISBN: 12, publishedDate: '2024-07-31' };
+  
+      await bookController.createBook(req, res, next);
+  
+      expect(next).toHaveBeenCalledWith(new CustomError(400, 'Author is missing'));
+    });
+
+    it('should not create a book if ISBN field is missing', async () => {
+      const { req, res, next } = mockExpressObjects();
+      req.body = { title: 'New Book', author: 'Author', publishedDate: '2024-07-31' };
+  
+      await bookController.createBook(req, res, next);
+  
+      expect(next).toHaveBeenCalledWith(new CustomError(400, 'ISBN is missing'));
+    });
+
+    it('should not create a book if title field is missing', async () => {
+      const { req, res, next } = mockExpressObjects();
+      req.body = { ISBN: 123, author: 'Author', publishedDate: '2024-07-31' };
+  
+      await bookController.createBook(req, res, next);
+  
+      expect(next).toHaveBeenCalledWith(new CustomError(400, 'Title is missing'));
     });
   });
 });
