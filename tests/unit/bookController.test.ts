@@ -148,5 +148,43 @@ describe('bookController', () => {
       expect(res.status).not.toHaveReturnedWith(200);
     });
   });
+
+  describe('getBook', () => {
+    let newBook: IBook;
+    it('should get a book by ID', async () => {
+      const { req, res, next } = mockExpressObjects();
+      newBook = await Book.create({
+        title: 'New Book',
+        author: 'Author',
+        publishedDate: '2024-08-01',
+        ISBN: 123456789
+      });
+      req.params = { id: newBook._id.toString() as string };
+
+      await bookController.getBook(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ success: 'true', data: expect.any(Object) });
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('should not get a book if the book ID is invalid', async () => {
+      const { req, res, next } = mockExpressObjects();
+      req.params = { id: 'invalid-id' };
+
+      await bookController.getBook(req, res, next);
+
+      expect(next).toHaveBeenCalledWith(new CustomError(400, 'Invalid book id'));
+    });
+
+    it('should not get a book if the book does not exist', async () => {
+      const { req, res, next } = mockExpressObjects();
+      req.params = { id: '60d0fe4f5311236168a109cb' };
+
+      await bookController.getBook(req, res, next);
+
+      expect(next).toHaveBeenCalledWith(new CustomError(404, 'Book not found'));
+    });
+  });
 });
   

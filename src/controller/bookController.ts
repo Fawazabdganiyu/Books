@@ -70,6 +70,22 @@ class BookController {
       return next(new CustomError(400, 'Error fetching books'));
     }
   };
+
+  static async getBook(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return next(new CustomError(400, 'Invalid book id'));
+    }
+
+    try {
+      const book = await Book.findById(id);
+      if (!book) return next(new CustomError(404, 'Book not found'));
+
+      res.status(200).json({ success: 'true', data: book });
+    } catch (error) {
+      return next(new CustomError(400, 'Error fetching book'));
+    }
+  }
 }
 
 export default BookController;

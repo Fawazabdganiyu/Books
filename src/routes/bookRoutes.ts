@@ -341,4 +341,63 @@ router.patch('/cover-image/:id', dynamicSingleUpload('coverImage'), BookControll
  */
 router.get('/', BookController.getBooks);
 
+/**
+ * @swagger
+ * /books/{id}:
+ *   get:
+ *     summary: Get a book by ID
+ *     tags: [Books]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the book to get
+ *     responses:
+ *       200:
+ *         description: The book
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Request status
+ *                 data:
+ *                   $ref: '#/components/schemas/Book'
+ *       404:
+ *         description: Book not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Request status
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   description: Error message
+ *                   example: Book not found
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Request status
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   description: Error message
+ *                   example: Error fetching book
+ */
+router.get('/:id', BookController.getBook);
+
 export default router;
