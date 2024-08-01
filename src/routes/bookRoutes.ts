@@ -92,7 +92,7 @@ const router = Router();
  *                 example: 123456789
  *               bookFile:
  *                 type: string
- *                 description: The file to upload (PDF or ePub)
+ *                 description: The book to be uploaded (PDF or ePub)
  *                 example: new-book.pdf
  *           example:   # Example for request body
  *             title: 'The New Age'
@@ -183,7 +183,7 @@ router.post('/', dynamicSingleUpload('bookFile'), BookController.createBook);
 
 /**
  * @swagger
- * /cover-image/{id}:
+ * /books/cover-image/{id}:
  *   patch:
  *     summary: Update book cover image
  *     description: Updates the cover image of a book.
@@ -286,5 +286,59 @@ router.post('/', dynamicSingleUpload('bookFile'), BookController.createBook);
  *                   example: 'Book not found'
  */
 router.patch('/cover-image/:id', dynamicSingleUpload('coverImage'), BookController.updateBookCoverImage);
+
+/**
+ * @swagger
+ * /books:
+ *   get:
+ *     summary: Get a list of all books in the collection
+ *     tags: [Books]
+ *     responses:
+ *       200:
+ *         description: The list of books
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Request status
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Book'
+ *       404:
+ *         description: Empty book collection
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Request status
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   description: Error message
+ *                   example: No book collection found
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Request status
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   description: Error message
+ *                   example: Error fetching books
+ */
+router.get('/', BookController.getBooks);
 
 export default router;

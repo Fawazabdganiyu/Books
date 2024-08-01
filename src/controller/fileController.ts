@@ -1,20 +1,26 @@
-import { Request, Response, NextFunction } from 'express';
 import fs from 'fs';
+import { Request, Response, NextFunction } from 'express';
+import mongoose from 'mongoose';
 import Book from '../models/bookModel';
-import customError from '../utils/customError';
+import CustomError from '../utils/customError';
 
 export default class FileController {
   static async uploadFile(req: Request, res: Response, next: NextFunction): Promise<void> {
-    if (!req.params.id) return next(new customError(400, 'Book ID is required'));
+    const { id } = req.params;
+    if (!id) return next(new CustomError(400, 'Book ID is required'));
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return next(new CustomError(400, 'Invalid product id'));
+    }
     
     try {
       const book = await Book.findById(req.params.id);
       if (!book) {
-        return next(new customError(404, 'Book not found'));
+        return next(new CustomError(404, 'Book not found'));
       }
 
       if (!req.file) {
-        return next(new customError(400, 'Error: No file selected'));
+        return next(new CustomError(400, 'Error: No file selected'));
       }
       
       if (book.bookFile) {
@@ -29,7 +35,7 @@ export default class FileController {
         message: 'File uploaded successfully'
       });
     } catch (error) {
-      return next(new customError(500, 'Error uploading file'));
+      return next(new CustomError(500, 'Error uploading file'));
     }
   }
 }

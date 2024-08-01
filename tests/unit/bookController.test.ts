@@ -117,6 +117,36 @@ describe('bookController', () => {
 
       expect(next).toHaveBeenCalledWith(new CustomError(400, 'Cover image is missing'));
     });
+
+    it('should not update the cover image if the book ID is invalid', async () => {
+      const { req, res, next } = mockExpressObjects();
+      req.params = { id: 'invalid-id' };
+
+      await bookController.updateBookCoverImage(req, res, next);
+
+      expect(next).toHaveBeenCalledWith(new CustomError(400, 'Invalid book id'));
+    });
+  });
+
+  describe('getBooks', () => {
+    it('should get all books', async () => {
+      const { req, res, next } = mockExpressObjects();
+
+      await bookController.getBooks(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ success: 'true', data: expect.any(Array) });
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('should call next with an error if no books are found', async () => {
+      const { req, res, next } = mockExpressObjects();
+      jest.spyOn(Book, 'find').mockResolvedValueOnce([]);
+
+      await bookController.getBooks(req, res, next);
+
+      expect(res.status).not.toHaveReturnedWith(200);
+    });
   });
 });
   
