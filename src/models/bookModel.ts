@@ -6,7 +6,8 @@ const bookSchema = new Schema<IBook>({
   author: { type: String, required: true },
   publishedDate: { type: String, required: true },
   ISBN: { type: Number, required: true },
-  storageUrl: { type: String }
+  bookFile: { type: String },
+  coverPicture: { type: String }
 }, {
   timestamps: true
 });

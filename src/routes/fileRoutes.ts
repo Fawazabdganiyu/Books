@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import dynamicSingleUpload from '../middlewares/fileUpload';
 import FileController from '../controller/fileController';
 
 const router = Router();
@@ -94,6 +95,6 @@ const router = Router();
  *                 success: "false"
  *                 message: Error uploading file
  */
-router.put('/upload/:id', FileController.uploadFile);
+router.put('/upload/:id', dynamicSingleUpload('bookFile'), FileController.uploadFile);
 
 export default router;

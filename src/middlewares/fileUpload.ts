@@ -1,7 +1,9 @@
+import fs from 'fs';
 import { Request, Response, NextFunction } from 'express';
 import multer, { StorageEngine, FileFilterCallback } from 'multer';
 import path from 'path';
 import checkFileType from '../utils/checkFileType';
+import customError from '../utils/customError';
 
 // Set storage engine
 const storage: StorageEngine = multer.diskStorage({
@@ -10,6 +12,7 @@ const storage: StorageEngine = multer.diskStorage({
     file: Express.Multer.File,
     cb: (error: Error | null, destination: string) => void
   ) => {
+    if (!fs.existsSync('uploads/')) fs.mkdirSync('uploads/')
     cb(null, 'uploads/');
   },
   filename: (
@@ -21,13 +24,24 @@ const storage: StorageEngine = multer.diskStorage({
   },
 });
 
-// Initialize upload
-const upload = multer({
-  storage,
-  limits: { fileSize: 5000000 }, // 5MB
-  fileFilter: (req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
-    checkFileType(file, cb);
-  },
-}).single('bookFile');
+const dynamicSingleUpload = (fieldName: string) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    // Initialize upload
+    const upload = multer({
+      storage,
+      limits: { fileSize: 5000000 }, // 5MB
+      fileFilter: (req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
+        checkFileType(file, cb);
+      },
+    }).single('bookFile');
+    
+    upload(req, res, (err: any) => {
+      if (err) {
+        return next(new customError(500, err.message));
+      }
+      next();
+    });
+  };
+}
 
-export default upload;
+export default dynamicSingleUpload;

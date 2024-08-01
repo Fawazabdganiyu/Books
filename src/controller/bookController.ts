@@ -29,7 +29,7 @@ class BookController {
     try {
       publishedDate = formatDate(publishedDate);
       const newBook = await Book.create({ title, author, publishedDate, ISBN, storageUrl: fileUrl });
-      const { storageUrl, ...rest } = newBook.toObject();
+      const { bookFile, ...rest } = newBook.toObject();
       res.status(201).json({ success: 'true', data: rest });
     } catch (error) {
       return next(new CustomError(400, 'Error creating book'));

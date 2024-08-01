@@ -6,5 +6,6 @@ export interface IBook extends Document {
   author: string;
   publishedDate: string;
   ISBN: number;
-  storageUrl?: string;
+  bookFile?: string;
+  coverPicture?: string;
 }
