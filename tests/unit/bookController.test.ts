@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { Request, Response, NextFunction } from 'express';
 import bookController from '../../src/controller/bookController';
 import Book from '../../src/models/bookModel';
@@ -184,6 +185,169 @@ describe('bookController', () => {
       await bookController.getBook(req, res, next);
 
       expect(next).toHaveBeenCalledWith(new CustomError(404, 'Book not found'));
+    });
+  });
+
+  describe('updateBook', () => {
+    let newBook: IBook;
+    it('should update a book by ID', async () => {
+      const { req, res, next } = mockExpressObjects();
+      newBook = await Book.create({
+        title: 'New Book',
+        author: 'Fawaz Abdganiyu',
+        publishedDate: '2024-08-01',
+        ISBN: 123456789
+      });
+      req.params = { id: newBook._id.toString() as string };
+      req.body = { title: 'Updated Book', author: 'John Smith', publishedDate: '2024-08-01', ISBN: 123456789 };
+
+      await bookController.updateBook(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ success: 'true', data: expect.any(Object) });
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({ title: 'Updated Book', author: 'John Smith' })
+      }));
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('should not update a book if the book ID is invalid', async () => {
+      const { req, res, next } = mockExpressObjects();
+      req.params = { id: 'invalid-id' };
+      req.body = { title: 'Updated Book', author: 'John Smith' };
+
+      await bookController.updateBook(req, res, next);
+
+      expect(next).toHaveBeenCalledWith(new CustomError(400, 'Invalid book id'));
+    });
+
+    it('should not update a book if the book does not exist', async () => {
+      const { req, res, next } = mockExpressObjects();
+      req.params = { id: '60d0fe4f5311236168a109cb' };
+
+      await bookController.updateBook(req, res, next);
+
+      expect(next).toHaveBeenCalledWith(new CustomError(404, 'Book not found'));
+    });
+
+    it('should update only a book title', async () => {
+      const { req, res, next } = mockExpressObjects();
+      req.params = { id: newBook._id.toString() as string };
+      req.body = { title: 'Updated Book' };
+
+      await bookController.updateBook(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ success: 'true', data: expect.any(Object) });
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({ title: 'Updated Book', author: 'John Smith' })
+      }));
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('should update only a book author', async () => {
+      const { req, res, next } = mockExpressObjects();
+      req.params = { id: newBook._id.toString() as string };
+      req.body = { author: 'John Smith' };
+
+      await bookController.updateBook(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ success: 'true', data: expect.any(Object) });
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({ title: 'Updated Book', author: 'John Smith' })
+      }));
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('should update only a book published date', async () => {
+      const { req, res, next } = mockExpressObjects();
+      req.params = { id: newBook._id.toString() as string };
+      req.body = { publishedDate: '2024-07-31' };
+
+      await bookController.updateBook(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ success: 'true', data: expect.any(Object) });
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({ publishedDate: 'Jul. 31, 2024', author: 'John Smith' })
+      }));
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('should update only a book ISBN', async () => {
+      const { req, res, next } = mockExpressObjects();
+      req.params = { id: newBook._id.toString() as string };
+      req.body = { ISBN: 6789 };
+
+      await bookController.updateBook(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ success: 'true', data: expect.any(Object) });
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({ ISBN: 6789, author: 'John Smith' })
+      }));
+      expect(next).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('deleteBook', () => {
+    let newBook: IBook;
+    it('should delete a book by ID', async () => {
+      const { req, res, next } = mockExpressObjects();
+      newBook = await Book.create({
+        title: 'New Book',
+        author: 'Fawaz Abdganiyu',
+        publishedDate: '2024-08-01',
+        ISBN: 1256789
+      });
+      req.params = { id: newBook._id.toString() as string };
+
+      await bookController.deleteBook(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ success: 'true', message: 'Book deleted successfully' });
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('should not delete a book if the book ID is invalid', async () => {
+      const { req, res, next } = mockExpressObjects();
+      req.params = { id: 'invalid-id' };
+
+      await bookController.deleteBook(req, res, next);
+
+      expect(next).toHaveBeenCalledWith(new CustomError(400, 'Invalid book id'));
+    });
+
+    it('should not delete a book if the book does not exist', async () => {
+      const { req, res, next } = mockExpressObjects();
+      req.params = { id: '60d0fe4f5311236168a109cb' };
+
+      await bookController.deleteBook(req, res, next);
+
+      expect(next).toHaveBeenCalledWith(new CustomError(404, 'Book not found'));
+    });
+
+    it('should delete all book files from storage', async () => {
+      const newBook1 = await Book.create({
+        title: 'New Book',
+        author: 'Fawaz Abdganiyu',
+        publishedDate: '2024-08-01',
+        ISBN: 1256789
+      });
+      const { req, res, next } = mockExpressObjects();
+      req.params = { id: newBook1._id.toString() as string };
+      req.body = { bookFile: 'new-book-file.pdf', coverImage: 'new-cover-image.jpg' };
+
+      await bookController.deleteBook(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ success: 'true', message: 'Book deleted successfully' });
+      expect(next).not.toHaveBeenCalled();
+      expect(newBook1.bookFile).toBeUndefined();
+      expect(newBook1.coverImage).toBeUndefined();
+      expect(fs.existsSync('uploads/new-book-file.pdf')).toBe(false);
+      expect(fs.existsSync('uploads/new-cover-image.jpg')).toBe(false);
     });
   });
 });

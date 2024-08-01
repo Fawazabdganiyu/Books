@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import Book from '../models/bookModel';
@@ -29,9 +30,8 @@ class BookController {
     // Create a new book
     try {
       publishedDate = formatDate(publishedDate);
-      const newBook = await Book.create({ title, author, publishedDate, ISBN, storageUrl: fileUrl });
-      const { bookFile, ...rest } = newBook.toObject();
-      res.status(201).json({ success: 'true', data: rest });
+      const newBook = await Book.create({ title, author, publishedDate, ISBN, bookFile: fileUrl });
+      res.status(201).json({ success: 'true', data: newBook.toObject() });
     } catch (error) {
       return next(new CustomError(400, 'Error creating book'));
     }
@@ -84,6 +84,54 @@ class BookController {
       res.status(200).json({ success: 'true', data: book });
     } catch (error) {
       return next(new CustomError(400, 'Error fetching book'));
+    }
+  }
+
+  static async updateBook(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return next(new CustomError(400, 'Invalid book id'));
+    }
+
+    try {
+      const book = await Book.findById(id);
+      if (!book) return next(new CustomError(404, 'Book not found'));
+
+      // Ensure the published date is formatted
+      if (req.body.publishedDate) req.body.publishedDate = formatDate(req.body.publishedDate);
+
+      const updatedBook = await Book.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
+      
+      res.status(200).json({ success: 'true', data: updatedBook });
+    } catch (error) {
+      return next(new CustomError(400, 'Error updating book'));
+    }
+  }
+
+  static async deleteBook(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return next(new CustomError(400, 'Invalid book id'));
+    }
+
+    try {
+      const book = await Book.findById(id);
+      if (!book) return next(new CustomError(404, 'Book not found'));
+
+      // Ensure the book files are deleted from the storage
+      if (book.bookFile) {
+        const filePath = book.bookFile;
+        fs.unlinkSync(filePath);
+      }
+      if (book.coverImage) {
+        const filePath = book.coverImage;
+        fs.unlinkSync(filePath);
+      }
+
+      await book.deleteOne();
+      res.status(200).json({ success: 'true', message: 'Book deleted successfully' });
+    } catch (error) {
+      return next(new CustomError(400, 'Error deleting book'));
     }
   }
 }
