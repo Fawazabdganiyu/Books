@@ -12,9 +12,9 @@ app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-app.use('/status', indexRouter);
-app.use('/books', bookRouter);
-app.use('/books', fileRouter);
+app.use('/api/status', indexRouter);
+app.use('/api/books', bookRouter);
+app.use('/api/books', fileRouter);
 
 app.use(errorHandler);
 

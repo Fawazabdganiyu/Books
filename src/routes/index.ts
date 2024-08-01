@@ -9,9 +9,10 @@ const router = Router();
  *   name: App
  *   description: Application status
  */
+
 /**
  * @swagger
- * /status:
+ * /api/status:
  *   get:
  *     summary: Get the status of the application
  *     tags: [App]

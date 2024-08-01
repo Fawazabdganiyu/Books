@@ -58,7 +58,7 @@ const router = Router();
 
 /**
  * @swagger
- * /books:
+ * /api/books:
  *   post:
  *     summary: Create a new book
  *     tags: [Books]
@@ -183,7 +183,7 @@ router.post('/', dynamicSingleUpload('bookFile'), BookController.createBook);
 
 /**
  * @swagger
- * /books/cover-image/{id}:
+ * /api/books/cover-image/{id}:
  *   patch:
  *     summary: Update book cover image
  *     description: Updates the cover image of a book.
@@ -289,7 +289,7 @@ router.patch('/cover-image/:id', dynamicSingleUpload('coverImage'), BookControll
 
 /**
  * @swagger
- * /books:
+ * /api/books:
  *   get:
  *     summary: Get a list of all books in the collection
  *     tags: [Books]
@@ -343,7 +343,7 @@ router.get('/', BookController.getBooks);
 
 /**
  * @swagger
- * /books/{id}:
+ * /api/books/{id}:
  *   get:
  *     summary: Get a book by ID
  *     tags: [Books]
@@ -402,7 +402,7 @@ router.get('/:id', BookController.getBook);
 
 /**
  * @swagger
- * /books/{id}:
+ * /api/books/{id}:
  *   put:
  *     summary: Update a book by ID
  *     tags: [Books]
@@ -463,7 +463,7 @@ router.put('/:id', BookController.updateBook);
 
 /**
  * @swagger
- * /books/{id}:
+ * /api/books/{id}:
  *   delete:
  *     summary: Delete a book by ID
  *     tags: [Books]

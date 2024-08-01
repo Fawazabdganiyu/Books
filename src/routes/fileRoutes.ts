@@ -6,7 +6,7 @@ const router = Router();
 
 /**
  * @swagger
- * /books/upload/{id}:
+ * /api/books/upload/{id}:
  *   put:
  *     summary: Upload a book file
  *     tags: [Books]
