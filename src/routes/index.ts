@@ -11,7 +11,7 @@ const router = Router();
  */
 /**
  * @swagger
- * /:
+ * /status:
  *   get:
  *     summary: Get the status of the application
  *     tags: [App]

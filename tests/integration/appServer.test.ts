@@ -12,7 +12,7 @@ describe('Application Server Connection', () => {
   });
 
   it('should start the express server', async () => {
-    const response = await request(app).get('/');
+    const response = await request(app).get('/status');
     expect(response.statusCode).toBe(200);
   });
 });
