@@ -30,14 +30,14 @@ npm run dev
 ## Endpoints
 | HTTP Verbs | Endpoint | Action |
 | --- | --- | --- |
-| GET | /status | Get Application Status |
-| POST | /books | Create a Book |
-| PATCH | /books/cover-image/:id | Update book with cover image |
-| GET | /books | Get All Books |
-| GET | /books/:id | Get a Book by ID |
-| PUT | /books/:id | Update a Book|
-| DELETE | /books/:id | Delete a Book |
-| PUT | /books/upload/:id | Upload a Book File |
+| GET | /api/status | Get Application Status |
+| POST | /api/books | Create a Book |
+| PATCH | /api/books/cover-image/:id | Update book with cover image |
+| GET | /api/books | Get All Books |
+| GET | /api/books/:id | Get a Book by ID |
+| PUT | /api/books/:id | Update a Book|
+| DELETE | /api/books/:id | Delete a Book |
+| PUT | /api/books/upload/:id | Upload a Book File |
 
 
 ## Documentation
@@ -59,7 +59,7 @@ http://localhost:3000/api-docs
 ### Get Application Status
 #### Request Example
 ```bash
-curl https://localhost:3000/status
+curl https://localhost:3000/api/status
 ```
 #### Response:
 ```bash
@@ -119,7 +119,7 @@ To update the cover image of an existing book, send a PATCH request to /api/book
 
 #### Request Example
 ```bash
-curl -X PATCH http://localhost:3000/api/books/60af9044854b231c12345678/cover \
+curl -X PATCH http://localhost:3000/api/books/cover-image/60af9044854b231c12345678 \
 -H "Content-Type: multipart/form-data" \
 -F "coverImage=@/path/to/cover/image"
 ```
@@ -129,7 +129,6 @@ The response will include the updated book information, similar to the add new b
 ```bash
 {
   "success": "true",
-  "message": "Book cover image updated successfully",
   "data": {
     "_id": "60af9044854b231c12345678",
     "title": "The Great Gatsby",
