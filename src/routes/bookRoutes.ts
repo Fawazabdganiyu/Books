@@ -16,7 +16,7 @@ const router = Router();
  *         - publishedDate
  *         - ISBN
  *       properties:
- *         id:
+ *         _id:
  *           type: string
  *           description: The auto-generated id of the book
  *         title:
@@ -32,20 +32,21 @@ const router = Router();
  *           type: number
  *           description: The ISBN of the book
  *         createdAt:
- *           type: Date
+ *           type: string
+ *           format: date-time
  *           description: The date the book was created
  *         updatedAt:
- *           type: Date
+ *           type: string
+ *           format: date-time
  *           description: The date the book was last updated
  *       example:
- *         id: 66aa2c5caa4d1d2ffb7a13a5
+ *         _id: 66aa2c5caa4d1d2ffb7a13a5
  *         title: 'The New Age'
  *         author: 'Fawaz Abdganiyu'
  *         publishedDate: 'Jul. 31, 2024'
  *         ISBN: '123456789'
- *         createdAt: '2021-08-01T00:00:00.000Z'
- *         updatedAt: '2021-08-01T00:00:00.000Z'  
- *
+ *         createdAt: "2021-08-01T00.00.00.000Z"
+ *         updatedAt: "2021-08-01T00.00.00.000Z"
  */
 
 /**
@@ -88,10 +89,11 @@ const router = Router();
  *               ISBN:
  *                 type: number
  *                 description: The ISBN of the book
+ *                 example: 123456789
  *               bookFile:
- *                 type: file
+ *                 type: string
  *                 description: The file to upload (PDF or ePub)
- *             
+ *                 example: new-book.pdf
  *           example:   # Example for request body
  *             title: 'The New Age'
  *             author: 'Fawaz Abdganiyu'
@@ -103,14 +105,47 @@ const router = Router();
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Book'
- *             example:
- *               id: 66aa2c5caa4d1d2ffb7a13a5
- *               title: 'The New Age'
- *               author: 'Fawaz Abdganiyu'
- *               publishedDate: 'Apr. 1, 2024'  # Output format
- *               createdAt: '2021-08-01T00:00:00.000Z'
- *               updatedAt: '2021-08-01T00:00:00.000Z'
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Request status
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: '60d0fe4f5311236168a109ca'
+ *                     title:
+ *                       type: string
+ *                       description: The title of the book
+ *                       example: 'The New Age'
+ *                     author:
+ *                       type: string
+ *                       description: The author of the book
+ *                       example: 'Fawaz Abdganiyu'
+ *                     publishedDate:
+ *                       type: string
+ *                       description: The published date of the book
+ *                       example: 'Jul. 31, 2024'
+ *                     ISBN:
+ *                       type: number
+ *                       description: The unique ISBN of the book
+ *                       example: 123456789
+ *                     bookFile:
+ *                       type: string
+ *                       description: The file URL of the book
+ *                       example: 'uploads/new-book.pdf'
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       description: The date the book was created
+ *                       example: '2021-08-01T00:00:00.000Z'
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       description: The date the book was last updated
+ *                       example: '2021-08-01T00:00:00.000Z'
  *       400:
  *         description: Bad request. The book already exists
  *         content:
@@ -145,5 +180,111 @@ const router = Router();
  *                 message: Error uploading file
  */
 router.post('/', dynamicSingleUpload('bookFile'), BookController.createBook);
+
+/**
+ * @swagger
+ * /cover-image/{id}:
+ *   patch:
+ *     summary: Update book cover image
+ *     description: Updates the cover image of a book.
+ *     tags:
+ *       - Books
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the book to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               coverImage:
+ *                 type: string
+ *                 format: binary
+ *                 description: The cover image file to upload
+ *     responses:
+ *       200:
+ *         description: Cover image updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Request status
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: '60d0fe4f5311236168a109ca'
+ *                     title:
+ *                       type: string
+ *                       description: The title of the book
+ *                       example: 'The New Age'
+ *                     author:
+ *                       type: string
+ *                       description: The author of the book
+ *                       example: 'Fawaz Abdganiyu'
+ *                     publishedDate:
+ *                       type: string
+ *                       description: The published date of the book
+ *                       example: 'Jul. 31, 2024'
+ *                     ISBN:
+ *                       type: number
+ *                       description: The unique ISBN of the book
+ *                       example: 123456789
+ *                     bookFile:
+ *                       type: string
+ *                       description: The file URL of the book
+ *                       example: 'uploads/new-book.pdf'
+ *                     coverImage:
+ *                       type: string
+ *                       description: The cover image URL of the book
+ *                       example: 'uploads/new-image.jpg'
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                       description: The date the book was created
+ *                       example: '2021-08-01T00:00:00.000Z'
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       description: The date the book was last updated
+ *                       example: '2021-08-01T00:00:00.000Z'
+ *       400:
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: 'Error updating cover image'
+ *       404:
+ *         description: Book not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: 'Book not found'
+ */
+router.patch('/cover-image/:id', dynamicSingleUpload('coverImage'), BookController.updateBookCoverImage);
 
 export default router;

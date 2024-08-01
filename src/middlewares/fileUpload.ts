@@ -24,6 +24,12 @@ const storage: StorageEngine = multer.diskStorage({
   },
 });
 
+/**
+ * Middleware for handling single file uploads dynamically.
+ *
+ * @param {string} fieldName - The name of the form field to parse for the file upload.
+ * @returns {function} The middleware function to handle file upload.
+ */
 const dynamicSingleUpload = (fieldName: string) => {
   return (req: Request, res: Response, next: NextFunction) => {
     // Initialize upload

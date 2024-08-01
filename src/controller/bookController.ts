@@ -8,10 +8,10 @@ class BookController {
     const { title, author, ISBN } = req.body;
     let publishedDate = req.body.publishedDate;
 
-  if (!title) return next(new CustomError(400, 'Title is missing'));
-  if (!author) return next(new CustomError(400, 'Author is missing'));
-  if (!publishedDate) return next(new CustomError(400, 'Published date is missing'));
-  if (!ISBN) return next(new CustomError(400, 'ISBN is missing'));
+    if (!title) return next(new CustomError(400, 'Title is missing'));
+    if (!author) return next(new CustomError(400, 'Author is missing'));
+    if (!publishedDate) return next(new CustomError(400, 'Published date is missing'));
+    if (!ISBN) return next(new CustomError(400, 'ISBN is missing'));
 
     // Check if the book already exists
     const book = await Book.findOne({ ISBN });
@@ -35,6 +35,25 @@ class BookController {
       return next(new CustomError(400, 'Error creating book'));
     }
   }
+
+  static async updateBookCoverImage(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const { id } = req.params;
+    try {
+      const book = await Book.findById(id);
+      if (!book) return next(new CustomError(404, 'Book not found'));
+
+      if (!req.file) return next(new CustomError(400, 'Cover image is missing'));
+
+      // Access the uploaded file via req.file
+      const fileUrl = `uploads/${req.file.filename}`;
+      book.coverImage = fileUrl;
+      await book.save();
+
+      res.status(200).json({ success: 'true', data: book.toObject() });
+    } catch (error) {
+      return next(new CustomError(400, 'Error updating cover image'));
+    }
+  } 
 }
 
 export default BookController;

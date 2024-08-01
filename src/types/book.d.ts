@@ -7,5 +7,5 @@ export interface IBook extends Document {
   publishedDate: string;
   ISBN: number;
   bookFile?: string;
-  coverPicture?: string;
+  coverImage?: string;
 }

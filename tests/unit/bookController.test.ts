@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import bookController from '../../src/controller/bookController';
+import Book from '../../src/models/bookModel';
+import { IBook } from '../../src/types/book';
 import { dbConnect, dbDisconnect } from '../testDatabase';
 import CustomError from '../../src/utils/customError';
 
@@ -72,6 +74,48 @@ describe('bookController', () => {
       await bookController.createBook(req, res, next);
   
       expect(next).toHaveBeenCalledWith(new CustomError(400, 'Title is missing'));
+    });
+  });
+
+  describe('updateBookCoverImage', () => {
+    let newBook: IBook;
+    it('should update the cover image of a book', async () => {
+      const { req, res, next } = mockExpressObjects();
+      newBook = await Book.create({
+        title: 'New Book',
+        author: 'Author',
+        publishedDate: '2024-07-31',
+        ISBN: 123456789
+      });
+      req.params = { id: newBook._id.toString() as string };
+      req.file = { filename: 'new-cover-image.jpg' } as Express.Multer.File;
+
+      await bookController.updateBookCoverImage(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ success: 'true', data: expect.any(Object) });
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({ coverImage: expect.any(String) })
+      }));
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('should not update the cover image if the book does not exist', async () => {
+      const { req, res, next } = mockExpressObjects();
+      req.params = { id: '60d0fe4f5311236168a109cb' };
+
+      await bookController.updateBookCoverImage(req, res, next);
+
+      expect(next).toHaveBeenCalledWith(new CustomError(404, 'Book not found'));
+    });
+
+    it('should not update the cover image if the cover image is missing', async () => {
+      const { req, res, next } = mockExpressObjects();
+      req.params = { id: newBook._id.toString() as string };
+
+      await bookController.updateBookCoverImage(req, res, next);
+
+      expect(next).toHaveBeenCalledWith(new CustomError(400, 'Cover image is missing'));
     });
   });
 });

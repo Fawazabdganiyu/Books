@@ -27,7 +27,8 @@ const router = Router();
  *             type: object
  *             properties:
  *               bookFile:
- *                 type: file
+ *                 type: string
+ *                 format: binary
  *                 description: The file to upload (PDF or ePub)
  *     responses:
  *       200:
